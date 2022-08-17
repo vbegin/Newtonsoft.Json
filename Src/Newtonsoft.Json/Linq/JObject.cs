@@ -135,15 +135,15 @@ namespace Newtonsoft.Json.Linq
             return _properties.IndexOfReference(item);
         }
 
-        internal override void InsertItem(int index, JToken? item, bool skipParentCheck)
+        internal override bool InsertItem(int index, JToken? item, bool skipParentCheck)
         {
             // don't add comments to JObject, no name to reference comment by
             if (item != null && item.Type == JTokenType.Comment)
             {
-                return;
+                return false;
             }
 
-            base.InsertItem(index, item, skipParentCheck);
+            return base.InsertItem(index, item, skipParentCheck);
         }
 
         internal override void ValidateToken(JToken o, JToken? existing)
@@ -742,7 +742,7 @@ namespace Newtonsoft.Json.Linq
             return ((ICustomTypeDescriptor)this).GetProperties(null);
         }
 
-        PropertyDescriptorCollection ICustomTypeDescriptor.GetProperties(Attribute[] attributes)
+        PropertyDescriptorCollection ICustomTypeDescriptor.GetProperties(Attribute[]? attributes)
         {
             PropertyDescriptor[] propertiesArray = new PropertyDescriptor[Count];
             int i = 0;
@@ -790,7 +790,7 @@ namespace Newtonsoft.Json.Linq
             return null;
         }
 
-        EventDescriptorCollection ICustomTypeDescriptor.GetEvents(Attribute[] attributes)
+        EventDescriptorCollection ICustomTypeDescriptor.GetEvents(Attribute[]? attributes)
         {
             return EventDescriptorCollection.Empty;
         }
@@ -800,7 +800,7 @@ namespace Newtonsoft.Json.Linq
             return EventDescriptorCollection.Empty;
         }
 
-        object? ICustomTypeDescriptor.GetPropertyOwner(PropertyDescriptor pd)
+        object? ICustomTypeDescriptor.GetPropertyOwner(PropertyDescriptor? pd)
         {
             if (pd is JPropertyDescriptor)
             {

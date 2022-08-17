@@ -1,7 +1,7 @@
 ﻿properties {
-  $zipFileName = "Json120r3.zip"
-  $majorVersion = "12.0"
-  $majorWithReleaseVersion = "12.0.3"
+  $zipFileName = "Json130r3.zip"
+  $majorVersion = "13.0"
+  $majorWithReleaseVersion = "13.0.2"
   $nugetPrerelease = $null
   $version = GetVersion $majorWithReleaseVersion
   $packageId = "Newtonsoft.Json"
@@ -14,8 +14,9 @@
   $workingName = if ($workingName) {$workingName} else {"Working"}
   $assemblyVersion = if ($assemblyVersion) {$assemblyVersion} else {$majorVersion + '.0.0'}
   $netCliChannel = "Current"
-  $netCliVersion = "3.0.100"
+  $netCliVersion = "6.0.300"
   $nugetUrl = "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe"
+  $ensureNetCliSdk = $true
 
   $baseDir  = resolve-path ..
   $buildDir = "$baseDir\Build"
@@ -31,8 +32,9 @@
   $nunitConsolePath = "$buildDir\Temp\NUnit.ConsoleRunner.$nunitConsoleVersion"
 
   $builds = @(
-    @{Framework = "netstandard2.0"; TestsFunction = "NetCliTests"; TestFramework = "netcoreapp3.0"; Enabled=$true},
-    @{Framework = "netstandard1.3"; TestsFunction = "NetCliTests"; TestFramework = "netcoreapp2.2"; Enabled=$true},
+    @{Framework = "net6.0"; TestsFunction = "NetCliTests"; TestFramework = "net6.0"; Enabled=$true},
+    @{Framework = "netstandard2.0"; TestsFunction = "NetCliTests"; TestFramework = "net5.0"; Enabled=$true},
+    @{Framework = "netstandard1.3"; TestsFunction = "NetCliTests"; TestFramework = "netcoreapp3.1"; Enabled=$true},
     @{Framework = "netstandard1.0"; TestsFunction = "NetCliTests"; TestFramework = "netcoreapp2.1"; Enabled=$true},
     @{Framework = "net45"; TestsFunction = "NUnitTests"; TestFramework = "net46"; NUnitFramework="net-4.0"; Enabled=$true},
     @{Framework = "net40"; TestsFunction = "NUnitTests"; NUnitFramework="net-4.0"; Enabled=$true},
@@ -69,7 +71,10 @@ task Build -depends Clean {
 
   mkdir "$buildDir\Temp" -Force
   
-  EnsureDotNetCli
+  if ($ensureNetCliSdk)
+  {
+    EnsureDotNetCli
+  }
   EnsureNuGetExists
   EnsureNuGetPackage "vswhere" $vswherePath $vswhereVersion
   EnsureNuGetPackage "NUnit.ConsoleRunner" $nunitConsolePath $nunitConsoleVersion
@@ -170,6 +175,8 @@ function EnsureDotnetCli()
     -OutFile "$buildDir\Temp\dotnet-install.ps1"
 
   exec { & $buildDir\Temp\dotnet-install.ps1 -Channel $netCliChannel -Version $netCliVersion | Out-Default }
+  exec { & $buildDir\Temp\dotnet-install.ps1 -Channel $netCliChannel -Version '3.1.402' | Out-Default }
+  exec { & $buildDir\Temp\dotnet-install.ps1 -Channel $netCliChannel -Version '2.1.811' | Out-Default }
 }
 
 function EnsureNuGetExists()
